@@ -16,6 +16,7 @@ require 'debugger'
 
 require './libs/syncUserList.rb'
 require './libs/backgroundLoop.rb'
+require './libs/eventsTraps.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -65,7 +66,7 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	include Syncuserlist, Backgroundloop
+	include Syncuserlist, Backgroundloop, Eventstraps
 
 	attr_accessor	:client, :db
 
@@ -219,6 +220,8 @@ end
 		#	Start Auto dj watcher, alone dj watcher, and blacklist watcher
 
 			bot.backgroundLoopInit			
+
+			bot.trapEvents
 
 		end # End Turntabler.run do
 
