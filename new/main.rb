@@ -14,6 +14,7 @@ require 'digest/md5'
 require 'nokogiri'
 require 'debugger'
 
+require './syncUserList.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -63,7 +64,9 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	attr_accessor	:client	
+	include Syncuserlist
+
+	attr_accessor	:client, :db
 
 	def initialize
 		punt
@@ -151,18 +154,22 @@ class Neurobot
       end
 		end
 
-		@db.query("select * from bot_sayings_#{MAGICKEY}").each do |row|
+		self.db.query("select * from bot_sayings_#{MAGICKEY}").each do |row|
     	@sayings.push(row[0]);
     end
+			
+			flags = 'A'
+			flags += 'B' if /B/ =~ @botData['flags']
 
 		if user == nil
 			self.client.room.say("#{CODENAME} #{VERSION}")
-			self.client.room.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ") 
-      self.client.room.say("Package B Activated") if /B/ =~ @botData['flags']
+			#self.client.room.say("[Triggers: #{@botData['triggers'].count}][Ads: #{@botData['ads'].count}][Events: #{@botData['events'].count}][Acls: #{jOutput['acl'].count}][Sayings: #{@sayings.count}][Packages: #{flags}]") 
+			self.client.room.say("[#{@botData['triggers'].count} triggers][#{@botData['ads'].count} ads][#{@botData['events'].count} events]")
+			self.client.room.say("[#{jOutput['acl'].count} acls][#{@sayings.count} sayings]")
+			self.client.room.say("[ #{flags} ]") 
 		else
 			user.say("#{CODENAME} #{VERSION}")
-			user.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ")
-			user.say("Package B Activated") if /B/ =~ @botData['flags']
+			user.say("[Triggers: #{@botData['triggers'].count}][Ads: #{@botData['ads'].count}][Events: #{@botData['events'].count}][Acls: #{jOutput['acl'].count}][Sayings: #{@sayings.count}][Packages: #{flags}]")
 		end
 
 		# Ad Spooler
@@ -176,10 +183,6 @@ class Neurobot
       @botData['running_timers'].push(timer)
     end
     rescue JSON::ParserError, SocketError
-	end
-	
-	def db
-		@db
 	end
 
 	def roomid
@@ -207,6 +210,12 @@ end
 		# Pull in all the information and spit out the startup
 		
 			bot.rehash(nil)
+
+		# Sync the user database with the current room settings
+
+
+			bot.syncUserList
+			
 
 		end # End Turntabler.run do
 
