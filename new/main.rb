@@ -14,8 +14,8 @@ require 'digest/md5'
 require 'nokogiri'
 require 'debugger'
 
-require './syncUserList.rb'
-require './backgroundLoop.rb'
+require './libs/syncUserList.rb'
+require './libs/backgroundLoop.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
