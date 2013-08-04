@@ -84,9 +84,10 @@ class Neurobot
 		
 		# Create our instance variables
 
-		@botData = Hash.new
-		@queue 	 = Array.new
-		@tabledjs= Array.new
+		@botData  = Hash.new
+		@queue 	  = Array.new
+		@tabledjs = Array.new
+		@snagged  = 0		
 	
 		# Load the first pass of bot variables		
 
