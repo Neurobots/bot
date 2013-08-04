@@ -15,7 +15,7 @@ module Processpkgb
   	message.sender.say( @botData['pkg_b_data']['8ball_'+rand(1..20).to_s] ) if ( @botData['pkg_b_data']['8ball_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['8ball_t']} /)) and ( loc == 1 )
 
   	# Weather
- 		if ( @botData['pkg_b_data']['weather_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['weather_t']} /))
+ 		if ( @botData['pkg_b_data']['weather_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['weather_t'])} /) )
 
     	zipCode = message.content.scan(/\d{5}/).shift
 
