@@ -79,7 +79,6 @@ class Neurobot
 		@botData['roomid'] = jOutput['bot_roomid']
 		@botData['ownerid'] = jOutput['owner_userid']
 
-
 	end
 	
 	def rehash(client, user)
@@ -180,10 +179,6 @@ class Neurobot
 		@botData['roomid']
 	end
 
-	def userid
-		@botData['userid']
-	end
-
 	def authid
 		@botData['authid']
 	end
@@ -200,7 +195,7 @@ end
 
 		# Start the client handle
 		
-			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => bot.userid, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
+			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
 
 		# Pull in all the information and spit out the startup
 		
