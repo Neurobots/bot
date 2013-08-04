@@ -37,6 +37,7 @@ abort "No Bot Userid found.  Usage: ./main <bot userid>" if !(ARGV.count > 0)
 USERID = ARGV.shift if ARGV.count > 0 
 
 puts "#{USERID} #{MAGICKEY} #{Process.pid}"
+puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 	
