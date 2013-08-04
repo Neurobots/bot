@@ -1,10 +1,11 @@
 require './libs/events/moderatorAdded.rb'
 require './libs/events/djAdded.rb'
 require './libs/events/djRemoved.rb'
+require './libs/events/roomUpdated.rb'
 
 module Eventstraps
 
-	include Moderatoradded, Djadded, Djremoved	
+	include Moderatoradded, Djadded, Djremoved, Roomupdated
 
 	def processEvent( user, t_event )
 		
@@ -35,6 +36,7 @@ module Eventstraps
 		moderatorAddedInit
 		djAddedInit			
 		djRemovedInit
+		roomUpdatedInit
 
 	end
 
