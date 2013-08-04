@@ -23,7 +23,7 @@ require './libs/processTriggers.rb'
 require './libs/processPkgB.rb'
 
 CODENAME = "neuroBot"
-VERSION  = "1.0 Alpha"
+VERSION  = "1.0 Beta"
 
 DBHOST   = 'hal'
 DBTABLE  = 'neurobots'
