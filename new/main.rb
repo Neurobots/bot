@@ -79,21 +79,6 @@ class Neurobot
 		@botData['roomid'] = jOutput['bot_roomid']
 		@botData['ownerid'] = jOutput['owner_userid']
 
-		# Start Eventmachine main loop
-		
-		Turntabler.interactive
-		Turntabler.run do
-
-		# Start the client handle
-		
-			@client = Turntabler::Client.new('', '', :room => @botData['roomid'], :user_id => @botData['userid'], :auth => @botData['authid'], :reconnect => true, :reconnect_wait => 15)
-
-		# Pull in all the information and spit out the startup
-		
-			rehash(@client, nil)
-
-
-		end # End Turntabler.run do
 
 	end
 	
@@ -187,8 +172,39 @@ class Neurobot
 		@db
 	end
 
+	def client
+		@client
+	end
+	
+	def roomid
+		@botData['roomid']
+	end
+
+	def userid
+		@botData['userid']
+	end
+
+	def authid
+		@botData['authid']
+	end
 end
 
 
 # Main
-Neurobot.new
+ 		bot = Neurobot.new
+		
+		# Start Eventmachine main loop
+				
+		Turntabler.interactive
+		Turntabler.run do
+
+		# Start the client handle
+		
+			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => bot.userid, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
+
+		# Pull in all the information and spit out the startup
+		
+			bot.rehash(bot.client, nil)
+
+		end # End Turntabler.run do
+
