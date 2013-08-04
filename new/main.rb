@@ -143,6 +143,7 @@ class Neurobot
 		jOutput['blacklist'].pop
 		@botData['blacklist'] = jOutput['blacklist'].map {|h| h['userid']}
 		
+		@aclCount = jOutput['acl'].count
 		jOutput['acl'].pop
 		jOutput['acl'].each { |acl|
         @botData['level1acl'].push(acl['userid']) if acl['access_level'] == "1"
