@@ -68,7 +68,7 @@ class Neurobot
 	end
 	
 	def punt
-	
+
 		# Create db handle
 		
 		@db = Mysql::new(DBHOST, DBUSER, DBPASS, DBTABLE)
@@ -86,9 +86,11 @@ class Neurobot
 		@botData['authid'] = jOutput['bot_authid']
 		@botData['roomid'] = jOutput['bot_roomid']
 		@botData['ownerid'] = jOutput['owner_userid']
+    @botData['running_timers'] =  []
+
 	end
 	
-	def rehash(client, user)
+	def rehash(user)
 		
 		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
 		
@@ -138,23 +140,23 @@ class Neurobot
         @botData['pkg_'+pkg.downcase+'_data'] = jOutput['pkg_'+pkg.downcase+'_data'][0] if /#{pkg}/ =~ @botData['flags']
 		end
 
-		@tabledjs = client.room.djs.to_a if @botData['queue']
+		@tabledjs = @client.room.djs.to_a if @botData['queue']
 
 
 		if jOutput['mods_to_lvl1'].to_i == 1
-    	client.room.moderators.each do |mod|
+    	@client.room.moderators.each do |mod|
       	@botData['level1acl'].push(mod.id)
       end
 		end
 
-		@db.query("select * from bot_sayings_#{$botData['magicKey']}").each do |row|
+		@db.query("select * from bot_sayings_#{MAGICKEY}").each do |row|
     	@sayings.push(row[0]);
     end
 
 		if user == nil
-			client.room.say("#{CODENAME} #{VERSION}")
-			client.room.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ") 
-      client.room.say("Package B Activated") if /B/ =~ @botData['flags']
+			@client.room.say("#{CODENAME} #{VERSION}")
+			@client.room.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ") 
+      @client.room.say("Package B Activated") if /B/ =~ @botData['flags']
 		else
 			user.say("#{CODENAME} #{VERSION}")
 			user.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ")
@@ -181,6 +183,10 @@ class Neurobot
 	def client
 		@client
 	end
+
+  def add_client_handler(client)
+		@client = client
+	end	
 	
 	def roomid
 		@botData['roomid']
@@ -193,20 +199,20 @@ end
 
 
 # Main
- 		bot = Neurobot.new
 		
 		# Start Eventmachine main loop
-				
+		
+		bot = Neurobot.new		
 		Turntabler.interactive
 		Turntabler.run do
 
 		# Start the client handle
 		
-			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
+			bot.add_client_handler((Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)))
 
 		# Pull in all the information and spit out the startup
 		
-			bot.rehash(bot.client, nil)
+			bot.rehash(nil)
 
 		end # End Turntabler.run do
 
