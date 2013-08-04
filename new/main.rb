@@ -15,6 +15,7 @@ require 'nokogiri'
 require 'debugger'
 
 require './syncUserList.rb'
+require './backgroundLoop.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -64,7 +65,7 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	include Syncuserlist
+	include Syncuserlist, Backgroundloop
 
 	attr_accessor	:client, :db
 
@@ -213,9 +214,11 @@ end
 
 		# Sync the user database with the current room settings
 
-
 			bot.syncUserList
-			
+
+		#	Start Auto dj watcher, alone dj watcher, and blacklist watcher
+
+			bot.backgroundLoopInit			
 
 		end # End Turntabler.run do
 
