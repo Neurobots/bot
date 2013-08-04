@@ -3,21 +3,21 @@ module Processpkgb
 	def processPkgB( message, loc )
 
   	# Dice  6
-  	self.client.room.say("#{message.sender.name} rolled a " + rand(1..6).to_s ) if ( @botData['pkg_b_data']['dice_6_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['dice_6_t']}/)) and ( loc == 0 )
-  	message.sender.say("#{message.sender.name} rolled a " + rand(1..6).to_s ) if ( @botData['pkg_b_data']['dice_6_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['dice_6_t']}/)) and ( loc == 1 )
+  	self.client.room.say("#{message.sender.name} rolled a " + rand(1..6).to_s ) if ( @botData['pkg_b_data']['dice_6_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['dice_6_t'])}/)) and ( loc == 0 )
+  	message.sender.say("#{message.sender.name} rolled a " + rand(1..6).to_s ) if ( @botData['pkg_b_data']['dice_6_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['dice_6_t'])}/)) and ( loc == 1 )
 
   	# Dice 20
-    self.client.room.say("#{message.sender.name} rolled a " + rand(1..20).to_s ) if ( @botData['pkg_b_data']['dice_20_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['dice_20_t']}/)) and ( loc == 0 )
-    message.sender.say("#{message.sender.name} rolled a " + rand(1..20).to_s ) if ( @botData['pkg_b_data']['dice_20_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['dice_20_t']}/)) and ( loc == 1 )
+    self.client.room.say("#{message.sender.name} rolled a " + rand(1..20).to_s ) if ( @botData['pkg_b_data']['dice_20_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['dice_20_t'])}/)) and ( loc == 0 )
+    message.sender.say("#{message.sender.name} rolled a " + rand(1..20).to_s ) if ( @botData['pkg_b_data']['dice_20_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['dice_20_t'])}/)) and ( loc == 1 )
 
   	# 8ball
-  	self.client.room.say( @botData['pkg_b_data']['8ball_'+rand(1..20).to_s] ) if ( @botData['pkg_b_data']['8ball_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['8ball_t']} /)) and ( loc == 0 )
-  	message.sender.say( @botData['pkg_b_data']['8ball_'+rand(1..20).to_s] ) if ( @botData['pkg_b_data']['8ball_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['8ball_t']} /)) and ( loc == 1 )
+  	self.client.room.say( @botData['pkg_b_data']['8ball_'+rand(1..20).to_s] ) if ( @botData['pkg_b_data']['8ball_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['8ball_t'])} /)) and ( loc == 0 )
+  	message.sender.say( @botData['pkg_b_data']['8ball_'+rand(1..20).to_s] ) if ( @botData['pkg_b_data']['8ball_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['8ball_t'])} /)) and ( loc == 1 )
 
   	# Weather
  		if ( @botData['pkg_b_data']['weather_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['weather_t'])} /) )
 
-    	zipCode = message.content.scan(/\d{5}/).shift
+    	zipCode = message.content.scan(/\d+/).shift
 
     	cnn = Nokogiri::HTML(open("http://weather.cnn.com/weather/forecast.jsp?zipCode=#{zipCode}"))
         location = cnn.css('div#cnnWeatherLocationHeader').shift.to_s.match(/\<b>(.*)<\/b>/)[1]
@@ -31,9 +31,9 @@ module Processpkgb
   	end
 
   	# Wikipedia
-    if ( @botData['pkg_b_data']['wikipedia_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['wikipedia_t']} /))
+    if ( @botData['pkg_b_data']['wikipedia_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['wikipedia_t'])} /))
 
-    	search = message.content.gsub(/^#{@botData['pkg_b_data']['wikipedia_t']} /, "")
+    	search = message.content.gsub(/^#{Regexp.escape(@botData['pkg_b_data']['wikipedia_t'])} /, "")
       rsearch = search.gsub(/ /,"_")
       myuri = "http://en.wikipedia.org/wiki/#{rsearch}"
     	wikipedia = Nokogiri::HTML(open(myuri))
@@ -45,7 +45,7 @@ module Processpkgb
     end
 
   	# Last.fm
-   	if ( @botData['pkg_b_data']['last_fm_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['last_fm_t']} /))
+   	if ( @botData['pkg_b_data']['last_fm_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['last_fm_t'])} /))
 
      	search = message.content.gsub(/^#{@botData['pkg_b_data']['last_fm_t']} /, "")
       rsearch = search.gsub(/ /,"+")
@@ -59,8 +59,8 @@ module Processpkgb
   	end
 
   	# User Lookup
-  	if ( @botData['pkg_b_data']['user_lookup_e'] == "1" ) and ( message.content.match(/^#{@botData['pkg_b_data']['user_lookup_t']} /))
-    	search = message.content.gsub(/^#{@botData['pkg_b_data']['user_lookup_t']} /, "")
+  	if ( @botData['pkg_b_data']['user_lookup_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['user_lookup_t'])} /))
+    	search = message.content.gsub(/^#{Regexp.escape(@botData['pkg_b_data']['user_lookup_t'])} /, "")
     	self.db.query("select * from bot_ustats_#{MAGICKEY} where LOWER(name) = LOWER('#{self.db.escape_string(search)}')  LIMIT 1").each do |row|
       	case  loc
     			when 0
