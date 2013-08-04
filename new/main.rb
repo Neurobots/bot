@@ -41,52 +41,42 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 	
-	def rehashFirstPass 
+	def initalize
 	
-		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
-		@botData['triggers'] = []
-		@botData['ads'] = []
-		@botData['events'] = []
-		@botData['acl'] = []
+		# Create db handle
+		
+		@db = Mysql::new("hal", "nirvana_neurobot", "571b7c5a6fe4", "neurobots")
+		
+		# Create our instance variables
 
+		@botData = Hash.new
+		
+		# Load the first pass of bot variables		
+
+		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
+		
 		@botData['authid'] = jOutput['bot_authid']
 		@botData['roomid'] = jOutput['bot_roomid']
 		@botData['ownerid'] = jOutput['owner_userid']
-		@botData['ads'] = jOutput['adverts']
-		@botData['triggers'] = jOutput['triggers']
-		jOutput['blacklist'].pop
-		@botData['blacklist'] = jOutput['blacklist'].map {|h| h['userid']}
-		@botData['command_trigger'] = jOutput['command_trigger']
-		@botData['events'] = jOutput['events']
-		@botData['events'].pop
-		@botData['triggers'].pop
-		@botData['ads'].pop
-		@botData['acl'] = jOutput['acl']
-		@botData['acl'].pop
-		@botData['level1acl'] = []
-		@botData['level2acl'] = []
-		@botData['level3acl'] = []
-		jOutput['acl'].each { |acl|
-    	@botData['level1acl'].push(acl['userid']) if acl['access_level'] == "1"
-      @botData['level2acl'].push(acl['userid']) if acl['access_level'] == "2"
-      @botData['level3acl'].push(acl['userid']) if acl['access_level'] == "3"
-		}
 
-		@botData['queue'] = false
-		@botData['slide'] = false
-
-		@botData['queue'] = true if jOutput['start_queue'].to_i == 1
-		@botData['slide'] = true if jOutput['start_slide'].to_i == 1
-
-		@sayings = []
-		@db.query("select * from bot_sayings_#{$botData['magicKey']}").each do |row|
-    	@sayings.push(row[0]);
-    end
-	
+		# Start Eventmachine main loop
 		
+		Turntabler.interactive
+		Turntabler.run do
+
+		# Start the client handle
+		
+		@client = Turntabler::Client.new('', '', :room => @botData['roomid'], :user_id => @botData['userid'], :auth => @botData['authid'], :reconnect => true, :reconnect_wait => 15)
+
+		# Pull in all the information and spit out the startup
+		
+		rehash(@client, nil)
+
+
+		end # End Turntabler.run do
+
 	end
-
-
+	
 	def rehash(client, user)
 		
 		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
@@ -171,39 +161,6 @@ class Neurobot
       @botData['running_timers'].push(timer)
     end
     rescue JSON::ParserError, SocketError
-	end
-
-
-		
-	def initalize
-	
-		# Create db handle
-		
-		@db = Mysql::new("hal", "nirvana_neurobot", "571b7c5a6fe4", "neurobots")
-		
-		# Create our instance variables
-
-		@botData = Hash.new
-		
-		# Load the first pass of bot variables		
-
-		rehashFirstPass
-
-		# Start Eventmachine main loop
-		
-		Turntabler.interactive
-		Turntabler.run do
-
-		# Start the client handle
-		
-		@client = Turntabler::Client.new('', '', :room => @botData['roomid'], :user_id => @botData['userid'], :auth => @botData['authid'], :reconnect => true, :reconnect_wait => 15)
-
-		# Pull in all the information and spit out the startup
-		rehash(@client, nil)
-
-
-		end # End Turntabler.run do
-
 	end
 	
 	def db
