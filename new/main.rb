@@ -12,6 +12,8 @@ require 'pp'
 require 'mysql'
 require 'digest/md5'
 require 'nokogiri'
+require 'debugger'
+
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -60,8 +62,12 @@ puts "#{CODENAME} #{VERSION}"
 
 
 class Neurobot
+
+	def initialize
+		punt
+	end
 	
-	def initalize
+	def punt
 	
 		# Create db handle
 		
@@ -75,10 +81,11 @@ class Neurobot
 
 		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
 		
+		#debugger
+	
 		@botData['authid'] = jOutput['bot_authid']
 		@botData['roomid'] = jOutput['bot_roomid']
 		@botData['ownerid'] = jOutput['owner_userid']
-
 	end
 	
 	def rehash(client, user)
