@@ -4,9 +4,15 @@ module Songended
 
     self.client.on :song_ended do |song|
     	if song.played_by != self.client.user
-    		self.db.query("update bot_sstats_#{MAGICKEY} set times_awesomed=times_awesomed+#{song.up_votes_count}, times_lamed=times_lamed+#{song.down_votes_count} where songid='#{digest(song.title, song.artist)}'")
+				votes_up = 0
+				votes_down = 0
+				song.votes.each do |vote|
+					votes_up += 1 if vote.direction == :up
+					votes_down += 1 if vote.direction == :down
+				end
+    		self.db.query("update bot_sstats_#{MAGICKEY} set times_awesomed=times_awesomed+#{votes_up}, times_lamed=times_lamed+#{votes_down} where songid='#{digest(song.title, song.artist)}'")
     		self.client.room.say("#{song.title}") if @botData['stats']
-    		self.client.room.say("Round:[ #{song.up_votes_count} :thumbsup:  ][ #{song.down_votes_count} :thumbsdown:  ][ #{@snagged} <3  ]") if @botData['stats']
+    		self.client.room.say("Round:[ #{votes_up} :thumbsup:  ][ #{votes_down} :thumbsdown:  ][ #{@snagged} <3  ]") if @botData['stats']
     		@snagged=0
 
     		self.db.query("select times_awesomed, times_lamed, times_snagged, times_played from bot_sstats_#{MAGICKEY} where songid='#{digest(song.title, song.artist)}' limit 1").each do |lsong|
