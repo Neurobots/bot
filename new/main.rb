@@ -14,13 +14,32 @@ require 'digest/md5'
 require 'nokogiri'
 
 CODENAME = "neuroBot"
-VERSION = "1.0 Alpha"
+VERSION  = "1.0 Alpha"
+
+DBHOST   = 'hal'
+DBTABLE  = 'neurobots'
 
 # Sanitize the envrioment first, the enviroment should have the magic key and the command line the bot_userid.  
 # The bot userid is consider public knowledge so there is no desire to protect that.  
 # However the magic_key is how we two factor everything, so we want to protect that.
 
-# Check for magic key first
+# Check for db username
+
+abort "No dbuser in envrioment variable" if !ENV.include? 'DBUSER' 
+
+# Set constatnt for db username
+
+DBUSER = ENV['DBUSER'] if ENV.include? 'DBUSER'
+
+# Check for db pass
+
+abort "No db pass in envrioment variable" if !ENV.include? 'DBPASS' 
+
+# Set constatnt for DBPASS
+
+DBPASS = ENV['DBPASS'] if ENV.include? 'DBPASS'
+
+# Check for magic key
 
 abort "No magic key in envrioment variable" if !ENV.include? 'MAGICKEY' 
 
@@ -39,13 +58,14 @@ USERID = ARGV.shift if ARGV.count > 0
 puts "#{USERID} #{MAGICKEY} #{Process.pid}"
 puts "#{CODENAME} #{VERSION}"
 
+
 class Neurobot
 	
 	def initalize
 	
 		# Create db handle
 		
-		@db = Mysql::new("hal", "nirvana_neurobot", "571b7c5a6fe4", "neurobots")
+		@db = Mysql::new(DBHOST, DBUSER, DBPASS, DBTABLE)
 		
 		# Create our instance variables
 
@@ -66,11 +86,11 @@ class Neurobot
 
 		# Start the client handle
 		
-		@client = Turntabler::Client.new('', '', :room => @botData['roomid'], :user_id => @botData['userid'], :auth => @botData['authid'], :reconnect => true, :reconnect_wait => 15)
+			@client = Turntabler::Client.new('', '', :room => @botData['roomid'], :user_id => @botData['userid'], :auth => @botData['authid'], :reconnect => true, :reconnect_wait => 15)
 
 		# Pull in all the information and spit out the startup
 		
-		rehash(@client, nil)
+			rehash(@client, nil)
 
 
 		end # End Turntabler.run do
@@ -168,3 +188,7 @@ class Neurobot
 	end
 
 end
+
+
+# Main
+Neurobot.new
