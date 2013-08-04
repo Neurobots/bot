@@ -17,6 +17,7 @@ require 'debugger'
 require './libs/syncUserList.rb'
 require './libs/backgroundLoop.rb'
 require './libs/eventsTraps.rb'
+require './libs/processAntiIdle.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -66,7 +67,7 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	include Syncuserlist, Backgroundloop, Eventstraps
+	include Syncuserlist, Backgroundloop, Eventstraps, Processantiidle
 
 	attr_accessor	:client, :db
 
@@ -83,7 +84,9 @@ class Neurobot
 		# Create our instance variables
 
 		@botData = Hash.new
-		
+		@queue 	 = Array.new
+		@tabledjs= Array.new
+	
 		# Load the first pass of bot variables		
 
 		jOutput = JSON.parse((URI.parse("http://www.neurobots.net/websockets/pull.php?bot_userid=#{USERID}&magic_key=#{MAGICKEY}")).read)
