@@ -9,10 +9,11 @@ require './libs/events/songSnagged.rb'
 require './libs/events/songVoted.rb'
 require './libs/events/nameUpdated.rb'
 require './libs/events/userJoined.rb'
+require './libs/events/userParted.rb'
 
 module Eventstraps
 
-	include Moderatoradded, Djadded, Djremoved, Roomupdated, Userbooted, Songstarted, Songended, Songsnagged, Songvoted, Nameupdated, Userjoined
+	include Moderatoradded, Djadded, Djremoved, Roomupdated, Userbooted, Songstarted, Songended, Songsnagged, Songvoted, Nameupdated, Userjoined, Userparted
 
 	def processEvent( user, t_event )
 		
@@ -51,6 +52,7 @@ module Eventstraps
 		songVotedInit
 		nameUpdatedInit
 	  userJoinedInit
+		userPartedInit
 
 	end
 
