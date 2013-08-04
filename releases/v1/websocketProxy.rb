@@ -53,7 +53,7 @@ end
 end
 
 EM.run {
-   Dir.chdir("/home/joshua/neuroserver/bot/new")
+   Dir.chdir("/home/joshua/neuroserver/bot/releases/v1")
    puts `pwd`
    $spoolerHandler = EventMachine.popen("./main.rb #{ENV['BOTUSERID']}", RubyCounter) 
    uptime = `date +%s`.to_i
