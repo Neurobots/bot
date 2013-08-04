@@ -63,6 +63,8 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
+	attr_accessor	:client	
+
 	def initialize
 		punt
 	end
@@ -144,7 +146,7 @@ class Neurobot
 
 
 		if jOutput['mods_to_lvl1'].to_i == 1
-    	@client.room.moderators.each do |mod|
+    	self.client.room.moderators.each do |mod|
       	@botData['level1acl'].push(mod.id)
       end
 		end
@@ -154,9 +156,9 @@ class Neurobot
     end
 
 		if user == nil
-			@client.room.say("#{CODENAME} #{VERSION}")
-			@client.room.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ") 
-      @client.room.say("Package B Activated") if /B/ =~ @botData['flags']
+			self.client.room.say("#{CODENAME} #{VERSION}")
+			self.client.room.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ") 
+      self.client.room.say("Package B Activated") if /B/ =~ @botData['flags']
 		else
 			user.say("#{CODENAME} #{VERSION}")
 			user.say("triggers: #{@botData['triggers'].count} ads: #{@botData['ads'].count} events: #{@botData['events'].count} acls: #{jOutput['acl'].count} sayings: #{@sayings.count} ")
@@ -180,14 +182,6 @@ class Neurobot
 		@db
 	end
 
-	def client
-		@client
-	end
-
-  def add_client_handler(client)
-		@client = client
-	end	
-	
 	def roomid
 		@botData['roomid']
 	end
@@ -208,7 +202,7 @@ end
 
 		# Start the client handle
 		
-			bot.add_client_handler((Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)))
+			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
 
 		# Pull in all the information and spit out the startup
 		
