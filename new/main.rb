@@ -19,6 +19,8 @@ require './libs/backgroundLoop.rb'
 require './libs/eventsTraps.rb'
 require './libs/processAntiIdle.rb'
 require './libs/digest.rb'
+require './libs/processTriggers.rb'
+require './libs/processPkgB.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Alpha"
@@ -68,7 +70,7 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	include Syncuserlist, Digest, Backgroundloop, Eventstraps, Processantiidle
+	include Syncuserlist, Digest, Backgroundloop, Eventstraps, Processantiidle, Processtriggers, Processpkgb
 
 	attr_accessor	:client, :db
 
