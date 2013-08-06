@@ -25,7 +25,7 @@ require './libs/processPkgB.rb'
 CODENAME = "neuroBot"
 VERSION  = "1.0 Beta"
 
-DBHOST   = 'shadow'
+DBHOST   = 'localhost'
 DBTABLE  = 'neurobots'
 
 # Sanitize the envrioment first, the enviroment should have the magic key and the command line the bot_userid.  

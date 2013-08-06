@@ -6,11 +6,13 @@ module Songended
     	if song.played_by != self.client.user
 				votes_up = 0
 				votes_down = 0
+				# There is a horrible bug here.  song votes each isn't populated every time and trying to calculate it ourselves isn't working either which means it's not getting saved to ustats right at all
+			  # I think this is an api bug but i'm not sure yet.  I"m checking in the temp fix for it now
 				song.votes.each do |vote|
 					votes_up += 1 if vote.direction == :up
 					votes_down += 1 if vote.direction == :down
 				end
-    		self.db.query("update bot_sstats_#{MAGICKEY} set times_awesomed=times_awesomed+#{votes_up}, times_lamed=times_lamed+#{votes_down} where songid='#{digest(song.title, song.artist)}'")
+    		self.db.query("update bot_sstats_#{MAGICKEY} set times_awesomed=times_awesomed+#{song.votes_count_up}, times_lamed=times_lamed+#{song.votes_count_down} where songid='#{digest(song.title, song.artist)}'")
     		self.client.room.say("#{song.title}") if @botData['stats']
     		self.client.room.say("Round:[ #{votes_up} :thumbsup:  ][ #{votes_down} :thumbsdown:  ][ #{@snagged} <3  ]") if @botData['stats']
     		@snagged=0
