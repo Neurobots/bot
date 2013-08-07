@@ -21,6 +21,7 @@ require './libs/processAntiIdle.rb'
 require './libs/digest.rb'
 require './libs/processTriggers.rb'
 require './libs/processPkgB.rb'
+require './libs/processAutoBop.rb'
 
 CODENAME = "neuroBot"
 VERSION  = "1.0 Beta"
@@ -70,7 +71,7 @@ puts "#{CODENAME} #{VERSION}"
 
 class Neurobot
 
-	include Syncuserlist, Digest, Backgroundloop, Eventstraps, Processantiidle, Processtriggers, Processpkgb
+	include Syncuserlist, Digest, Backgroundloop, Eventstraps, Processantiidle, Processtriggers, Processpkgb, Processautobop
 
 	attr_accessor	:client, :db
 
@@ -111,6 +112,7 @@ class Neurobot
 		@errorcounts = {}
 		@antiIdle = []
 		@sayings = []
+		@autobop_count = 0
 
 		@botData['authid'] = jOutput['bot_authid']
 		@botData['roomid'] = jOutput['bot_roomid']
@@ -131,14 +133,15 @@ class Neurobot
 		@botData['stats'] = false
 		@botData['autoReQueue'] = false
 		@botData['alonedj'] = false
+		@botData['autobop'] = false
 		@botData['flags'] = jOutput['flags']
 		@botData['queue'] = true if jOutput['start_queue'].to_i == 1
 		@botData['slide'] = true if jOutput['start_slide'].to_i == 1
 		@botData['autodj'] = true if jOutput['start_autodj'].to_i == 1
-		@botData['stats'] = true if jOutput['start_stats'] .to_i == 1
-		@botData['autoReQueue'] = true if jOutput['switch_autorequeue'] .to_i == 1
-		@botData['alonedj'] = true if jOutput['switch_alonedj'] .to_i == 1
-
+		@botData['stats'] = true if jOutput['start_stats'].to_i == 1
+		@botData['autoReQueue'] = true if jOutput['switch_autorequeue'].to_i == 1
+		@botData['alonedj'] = true if jOutput['switch_alonedj'].to_i == 1
+    @botData['autobop'] = true if jOutput['autobop'].to_i == 1
 		
 		jOutput['blacklist'].pop
 		@botData['blacklist'] = jOutput['blacklist'].map {|h| h['userid']}

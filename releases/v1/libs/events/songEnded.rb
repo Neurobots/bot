@@ -3,6 +3,7 @@ module Songended
 	def songEndedInit
 
     self.client.on :song_ended do |song|
+			@autobop_count = 0
     	if song.played_by != self.client.user
 				votes_up = 0
 				votes_down = 0
