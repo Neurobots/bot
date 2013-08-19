@@ -14,7 +14,6 @@ require 'digest/md5'
 require 'nokogiri'
 require 'debugger'
 require 'colorize'
-require 'discogs'
 
 require './libs/syncUserList.rb'
 require './libs/backgroundLoop.rb'
@@ -69,10 +68,6 @@ USERID = ARGV.shift if ARGV.count > 0
 
 puts "#{USERID} #{MAGICKEY} #{Process.pid}"
 puts "#{CODENAME} #{VERSION}"
-
-
-discoapi = Discogs::Wrapper.new("My awesome web app")
-
 
 class Neurobot
 
