@@ -13,6 +13,8 @@ require 'mysql'
 require 'digest/md5'
 require 'nokogiri'
 require 'debugger'
+require 'colorize'
+require 'discogs'
 
 require './libs/syncUserList.rb'
 require './libs/backgroundLoop.rb'
@@ -69,6 +71,9 @@ puts "#{USERID} #{MAGICKEY} #{Process.pid}"
 puts "#{CODENAME} #{VERSION}"
 
 
+discoapi = Discogs::Wrapper.new("My awesome web app")
+
+
 class Neurobot
 
 	include Syncuserlist, Digest, Backgroundloop, Eventstraps, Processantiidle, Processtriggers, Processpkgb, Processautobop
@@ -113,6 +118,8 @@ class Neurobot
 		@antiIdle = []
 		@sayings = []
 		@autobop_count = 0
+		@votes = []
+		@anti_idle_running = false
 
 		@botData['authid'] = jOutput['bot_authid']
 		@botData['roomid'] = jOutput['bot_roomid']
@@ -134,7 +141,7 @@ class Neurobot
 		@botData['autoReQueue'] = false
 		@botData['alonedj'] = false
 		@botData['autobop'] = false
-		@botData['flags'] = jOutput['flags']
+		@botData['flags'] = jOutput['flags'].to_s
 		@botData['queue'] = true if jOutput['start_queue'].to_i == 1
 		@botData['slide'] = true if jOutput['start_slide'].to_i == 1
 		@botData['autodj'] = true if jOutput['start_autodj'].to_i == 1
@@ -142,7 +149,7 @@ class Neurobot
 		@botData['autoReQueue'] = true if jOutput['switch_autorequeue'].to_i == 1
 		@botData['alonedj'] = true if jOutput['switch_alonedj'].to_i == 1
     @botData['autobop'] = true if jOutput['autobop'].to_i == 1
-		
+		# @botData['autobop'] = true
 		jOutput['blacklist'].pop
 		@botData['blacklist'] = jOutput['blacklist'].map {|h| h['userid']}
 		
@@ -219,6 +226,7 @@ end
 		# Start the client handle
 		
 			bot.client = Turntabler::Client.new('', '', :room => bot.roomid, :user_id => USERID, :auth => bot.authid, :reconnect => true, :reconnect_wait => 15)
+			
 
 		# Pull in all the information and spit out the startup
 		

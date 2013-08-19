@@ -260,6 +260,8 @@ end
               else
               	URI.parse("http://www.neurobots.net/websockets/blacklistpush.php?magic_key=#{MAGICKEY}&target=#{userid}&reason=#{message.sender.id}").read
                 @botData['blacklist'].push("#{userid}")
+								self.client.room.dj(userid).boot('Blacklisted')
+								 #user.boot('Blacklisted') if @botData['blacklist'].include?(user.id)
                 #client.user(userid).boot(trigger['response'])
               end
 

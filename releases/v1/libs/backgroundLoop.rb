@@ -2,16 +2,38 @@ module Backgroundloop
 
 def backgroundLoopInit
 	# We should set 10 to a constant of TICK someday
-  EventMachine::PeriodicTimer.new(10) do
+  EventMachine::PeriodicTimer.new(5) do
     Turntabler.run {
+		# Process Anti-Idle
 
+		if @botData['flags'].match(/B/)
+			processAntiIdle( self.client.user ) if (@botData['pkg_b_data']['anti_idle'].to_i == 1)
+		end
+		
 		# These four control autodj and alone dj, they probably should be removed at some point because we are violating the tt TOS ( but I kinda don't care )
-    self.client.room.become_dj if (self.client.room.djs.count < 2) && (!self.client.user.dj?) && (@botData['autodj']) && (@botData['alonedj'])
-    self.client.room.become_dj if (self.client.room.djs.count < 2) && (!self.client.user.dj?) && (@botData['autodj']) && (!@botData['alonedj']) && (self.client.room.djs.count > 0)
+    #self.client.room.become_dj if (self.client.room.djs.count < 2) && (!self.client.user.dj?) && (@botData['autodj']) && (@botData['alonedj'])
+    #self.client.room.become_dj if (self.client.room.djs.count < 2) && (!self.client.user.dj?) && (@botData['autodj']) && (self.client.room.djs.count > 0)
     
-		self.client.user.remove_as_dj if (self.client.room.djs.count > 2 ) && (self.client.user.dj?) && (self.client.room.current_dj != self.client.user) && (@botData['autodj'])
-    self.client.user.remove_as_dj if (self.client.user.dj?) && ( self.client.room.djs.count == 1 ) && (!@botData['alonedj'])
+		#self.client.user.remove_as_dj if (self.client.room.djs.count > 2 ) && (self.client.user.dj?) && (self.client.room.current_dj != self.client.user) && (@botData['autodj'])
+		
+		# This is getting moved to song end because it's tripping up at the wrong times
+#   self.client.user.remove_as_dj if (self.client.user.dj?) && ( self.client.room.djs.count == 1 ) && (!@botData['alonedj'])
     
+
+		if (@botData['autodj'])and(!self.client.user.dj?)
+						
+			djs = self.client.room.djs.count
+			listeners = self.client.room.listeners.count - 1 # If i'm not the dj then I must be a listener
+			
+			self.client.room.become_dj if (djs==1)and(listeners>0) #auto dj
+			self.client.room.become_dj if (djs<2)and(listeners>0)and(@botData['alonedj'])  #alone dj
+
+		end
+
+
+
+
+
 		# Blacklist
 		self.client.room.listeners.each do |user|
 			# Executioner

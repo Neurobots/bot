@@ -1,10 +1,25 @@
 module Djremoved
 
   def djRemovedInit
+  puts "djRemovedInit called".yellow
 
   self.client.on :dj_removed do |user|
+	puts ":dj_removed called".red
+
+      #self.client.user.remove_as_dj if (self.client.user.dj?) and ( self.client.room.djs.count == 1 ) and (!@botData['alonedj']) and (@botData['autodj'])
+      puts "Dj's counted: #{self.client.room.djs.count}".yellow
+      # if were all by ourselves and djing we need to stop that
+      self.client.user.remove_as_dj if (self.client.user.dj?)and(self.client.room.listeners == 1)and(self.client.room.current_dj != self.client.user)
+      # if we have too many djs on stage, get down as well ( but only if were in autodj mode )
+      self.client.user.remove_as_dj if (self.client.room.djs.count > 2)and(@botData['autodj'])and(self.client.user.dj?)and(self.client.room.current_dj != self.client.user)
+      # if we are buy ourself onstage and we don't have alone dj get down
+      self.client.user.remove_as_dj if (self.client.user.dj?)and(self.client.room.djs.count == 1)and(!@botData['alonedj'])and(self.client.room.current_dj != self.client.user)and(@botData['autodj'])
+
   	processEvent( user,  "#dj_removed" )
-    PorocessAntiIdle(user,0) if /B/ =~ @botData['flags'] and (@botData['pkg_b_data']['anti_idle'].to_i == 1)
+		
+		if(@botData['flags'].match(/B/))
+	    processAntiIdle(user) if (@botData['pkg_b_data']['anti_idle'].to_i == 1)
+		end
     @tabledjs.delete(user) if @tabledjs.include?(user)
     if (!@running)&&(!@queue.empty?)
       @running = true

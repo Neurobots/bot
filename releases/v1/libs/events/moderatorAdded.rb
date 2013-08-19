@@ -1,12 +1,12 @@
 module Moderatoradded
 
-	  def moderatorAddedInit
+	def moderatorAddedInit
+		puts "moderatorAddedInit called".yellow
+		self.client.on :moderator_added do |user|
+			puts ":moderator_added called".red
+			processEvent( user, "#moderator_added" )
+		end
 
-    self.client.on :moderator_added do |user|
-      processEvent( client, user, "#moderator_added" )
-    end
-
-  end
-
+	end
 
 end

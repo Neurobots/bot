@@ -1,8 +1,9 @@
 module Userjoined
 
 	def userJoinedInit
-
+		puts "userJoinedInit called".yellow
   	self.client.on :user_entered do |user|
+			puts ":user_entered called".red
     	if @botData['blacklist'].include?(user.id)
       	user.boot('Blacklisted')
     	elsif user.id == client.user.id

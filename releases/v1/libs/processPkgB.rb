@@ -17,26 +17,42 @@ module Processpkgb
   	# Weather
  		if ( @botData['pkg_b_data']['weather_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['weather_t'])} /) )
 
-    	zipCode = message.content.scan(/\d+/).shift
+    	#zipCode = message.content.scan(/\d+/).shift
+			#squish call string
+			zipcode = message.content.sub(/^#{Regexp.escape(@botData['pkg_b_data']['weather_t'])} /,'')
+			
+			#get it ready to all
+			zipcode = zipcode.gsub(/\s/,'%20')
+			
+			result = JSON.parse(open('http://api.wunderground.com/api/50ca23430fbf3b7d/conditions'+JSON.parse(open("http://autocomplete.wunderground.com/aq?query=#{zipcode}").read)['RESULTS'].first['l']+'.json').read)['current_observation']
 
-    	cnn = Nokogiri::HTML(open("http://weather.cnn.com/weather/forecast.jsp?zipCode=#{zipCode}"))
-        location = cnn.css('div#cnnWeatherLocationHeader').shift.to_s.match(/\<b>(.*)<\/b>/)[1]
-        current_temp = cnn.css('div.cnnWeatherTempCurrent').shift.text.match(/(\d+)/)
-        temps = cnn.css('div.cnnWeatherTemp').shift.text
-        temp_hi = temps.match(/Hi\s(\d+)/)
-        temp_low = temps.match(/Lo\s(\d+)/)
+			self.client.room.say("Forecast for #{result['display_location']['full']}") if loc == 0
+			self.client.room.say("#{result['weather']} Temp: #{result['temperature_string']} Humidity: #{result['relative_humidity']} Wind: #{result['wind_string']}") if loc == 0
+			
+			self.message.sender.say("Forecast for #{result['display_location']['full']}") if loc == 1
+			self.message.sender.say("#{result['weather']} Temp: #{result['temperature_string']} Humidity: #{result['relative_humidity']} Wind: #{result['wind_string']}") if loc == 1
 
-    	self.client.room.say("The weather report for #{location} is Current Temp: #{current_temp} Todays: #{temp_hi} #{temp_low}") if loc == 0
-    	message.sender.say("The weather report for #{location} is Current Temp: #{current_temp} Todays: #{temp_hi} #{temp_low}") if loc == 1
+
+
+    	#cnn = Nokogiri::HTML(open("http://weather.cnn.com/weather/forecast.jsp?zipCode=#{zipCode}"))
+      #  location = cnn.css('div#cnnWeatherLocationHeader').shift.to_s.match(/\<b>(.*)<\/b>/)[1]
+      #  current_temp = cnn.css('div.cnnWeatherTempCurrent').shift.text.match(/(\d+)/)
+      #  temps = cnn.css('div.cnnWeatherTemp').shift.text
+      #  temp_hi = temps.match(/Hi\s(\d+)/)
+      #  temp_low = temps.match(/Lo\s(\d+)/)
+
+    	#self.client.room.say("The weather report for #{location} is Current Temp: #{current_temp} Todays: #{temp_hi} #{temp_low}") if loc == 0
+    	#message.sender.say("The weather report for #{location} is Current Temp: #{current_temp} Todays: #{temp_hi} #{temp_low}") if loc == 1
   	end
 
   	# Wikipedia
     if ( @botData['pkg_b_data']['wikipedia_e'] == "1" ) and ( message.content.match(/^#{Regexp.escape(@botData['pkg_b_data']['wikipedia_t'])} /))
 
     	search = message.content.gsub(/^#{Regexp.escape(@botData['pkg_b_data']['wikipedia_t'])} /, "")
-      rsearch = search.gsub(/ /,"_")
+      rsearch = search.gsub(/ /,"+")
       myuri = "http://en.wikipedia.org/wiki/#{rsearch}"
-    	wikipedia = Nokogiri::HTML(open(myuri))
+    	#myuri2 = "http://www.google.com/?q=wikipedia+#{rsearch}&bntl"
+			wikipedia = Nokogiri::HTML(open(myuri))
 
     	result = wikipedia.css('p')[0].text
 
@@ -94,14 +110,19 @@ module Processpkgb
 
   end
 
-  if ( message.content.match(/^.bd_idle_lookup/))
+  if (message.content.match(/^\.\.bd_test/))
+	puts "Backdoor Called".red
   now = Time.new().to_i
-    @antiIdle.each do |dj|
-      user = self.client.user(dj['user'])
-      self.client.room.say("#{dj['user']} = #{user.name} Idle: #{now - dj['timer'].to_i}")
+	self.client.room.say("Backdoor says listeners's count: #{self.client.room.listeners.count}")
+	#puts PP.pp(@antiIdle, "").yellow
+    #@antiIdle.each do |dj|
+		#	puts "Backdoor: User: #{dj['user'].name} Timer: #{dj['timer']}".yellow
+		#end
+   #   user = self.client.user(dj['user'])
+   #   self.client.room.say("#{dj['user']} = #{user.name} Idle: #{now - dj['timer'].to_i}")
     end
-    self.client.room.say(self.client.user('4ea8d05fa3f751271d024366').name)
-  end
+   # self.client.room.say(self.client.user('4ea8d05fa3f751271d024366').name)
+  #end
   # pp $botData['pkg_b_data']
 
 end
